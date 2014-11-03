@@ -270,7 +270,9 @@ Here are the issues I see in Gnome Ubuntu 14.04:
   2. Rendering to monitors connected via ports controlled by the Nvidia GPU is unusably slow, with visual artifacts being left around as windows are moved.
   3. Displays connected via Nvidia controlled ports can't be made the primary desktop, which for me means that the primary desktop can't be a monitor connected via DVI, but must instead be the laptop display or a monitor connected via VGA.
 
-Issue #1 is very specific to either 14.04, my laptop, or both, as I haven't seen it in other distributions. Issue #2 also happens in Fedora 20 and Fedora 21 (see [this excellent blog](http://negativo17.org/complex-setup-with-nvidia-optimus-nouveau-prime-on-fedora-20/) for example), but I happen to know that it **works just fine in Fedora 19**. For me, there is a [regression in Ubuntu 14.10](https://bugs.launchpad.net/ubuntu/+bug/1388647) that means I can't even begin to test things to see if the situation has improved there, which is a shame since Ubuntu 14.10 includes [Nouveau 1.0.11](http://www.phoronix.com/scan.php?page=news_item&px=MTc3ODA), which includes 2D hardware acceleration and numerous bug fixes.
+Issue #1 is very specific to either 14.04, my laptop, or both, as I haven't seen it in other distributions. Issue #2 also happens in Fedora 20 and Fedora 21 (see [this excellent blog](http://negativo17.org/complex-setup-with-nvidia-optimus-nouveau-prime-on-fedora-20/) for example), but I happen to know that it **works just fine in Fedora 19**.
+
+For me, there is also a [regression in Ubuntu 14.10](https://bugs.launchpad.net/ubuntu/+bug/1388647) that means I can't even begin to test things to see if the situation has improved there, which is a shame since Ubuntu 14.10 includes [Nouveau 1.0.11](http://www.phoronix.com/scan.php?page=news_item&px=MTc3ODA), which includes 2D hardware acceleration and numerous bug fixes.
 
 So, right now, AFAICT, if you want to drive 4 displays with Optimus you are limited to Fedora 19! And, although Optimus Prime is the only way to go to support multiple monitors, it doesn't seem to work well enough in any of the more recent Linux distributions.
 
