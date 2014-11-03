@@ -209,13 +209,13 @@ the temperatures stay below 50°C, and I get performance output like this:
 304 frames in 5.0 seconds = 60.641 FPS
 ```
 
-If I now run:
+But if I instead run:
 
 ``` bash
 DRI_PRIME=1 glxgears
 ```
 
-I instead get performance figures like this:
+I then get performance figures like this:
 
 ``` bash
 11209 frames in 5.0 seconds = 2241.788 FPS
