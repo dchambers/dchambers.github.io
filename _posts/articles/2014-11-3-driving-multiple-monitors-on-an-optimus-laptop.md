@@ -283,7 +283,7 @@ A colleague of mine at work suspects that Fedora 19 works better due to a change
 
 ### VGA Switcheroo
 
-If you do decide to go with Fedora 19, you will need to become better aquainted with `vga_switcheroo`. You can check the current status using the command:
+If you do decide to go with Fedora 19, you will need to become better aquainted with `vga_switcheroo`, so that you can enable and disable the discrete GPU. You can check the current status using the command:
 
 ``` bash
 sudo cat /sys/kernel/debug/vgaswitcheroo/switch
