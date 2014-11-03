@@ -4,7 +4,7 @@ title: "Driving Multiple Monitors on an Optimus Laptop"
 modified:
 categories: articles
 excerpt:
-tags: [linux, optimus, prime, randr, xrandr, vgaswitcheroo]
+tags: [linux, optimus, prime, xrandr, vgaswitcheroo]
 image:
   feature:
 date: 2014-11-03T21:38:00-00:00
