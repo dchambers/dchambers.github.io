@@ -14,11 +14,11 @@ date: 2014-11-03T21:38:00-00:00
 
 If you have an Optimus enabled laptop than it's quite possible it can drive 3 external monitors while using the internal display at the same time, giving you 4 displays in total. I'm creating this page because when I wanted to do exactly this I found a dearth of information on-line, with most of the resources I could find instead talking about using Optimus to allow the Intel and Nvidia GPUs to jointly drive a single display, or two displays at most.
 
-I'm therefore creating this page because I would have found it helpful myself. The fact it's me creating it is unfortunate since my knowledge of Linux, chipsets and GPUs is quite basic, but unfortunately the people that really understand this stuff tend to write in a way that assumes everybody else does too, so this is my attempt at creating a resource for the rest of us. It's no doubt laced with factual inconsistencies, but is hopefully close enough to the truth to be useful.
+I'm therefore creating this page because I would have found it helpful myself. The fact it's me creating it is unfortunate since my knowledge of Linux, chipsets and GPUs is quite basic, but unfortunately the people that really understand this stuff tend to write in a way that assumes everybody else does too, so this is my attempt at creating a resource for the rest of us. It probably contains some factual inconsistencies, but is hopefully close enough to the truth to be useful.
 
 ## Understanding Optimus Laptops
 
-To start with, it's worth describing what an Optimus laptop actually is. Really, it's just a laptop that has both an integrated Intel GPU (on the same die as the processor) and a discrete Nvidia GPU (in a separate chip), where each GPU can drive two displays at the same time, or where both GPUs can work in tandem to drive a lesser number of displays. Exactly which display ports each GPU has direct access to varies by laptop, but laptops where there are no jointly accessible display ports are known as _muxless_ laptops, as they don't contain a hardware multiplexer to switch access to the display ports.
+To start with, it's worth describing what an Optimus laptop actually is. Really, it's just a laptop that has both an integrated Intel GPU (on the same die as the processor) and a discrete Nvidia GPU (in a separate chip), where each GPU can drive one or more displays at the same time, or where both GPUs can work in tandem to drive a lesser number of displays. Exactly which display ports each GPU has direct access to varies by laptop, but laptops where there are no jointly accessible display ports are known as _muxless_ laptops, since they don't contain a hardware multiplexer to switch access to the display ports.
 
 If you run the `xrandr` command you'll see the list of display ports available. On my work laptop for example (a Lenovo T430), I see this:
 
@@ -43,7 +43,7 @@ DP-1-3 disconnected
 
 Unfortunately, the `xrandr` command doesn't explicitly state which display ports are connected to which GPU, but you can pretty much figure it out by all the extra hyphens added to the port names for the discrete GPU (e.g. `LVDS-1-2`).
 
-If your laptop has a BIOS setting that allows you to control which GPUs are active, then your laptop definitely isn't _muxless_, and it becomes possible to conclusively know which GPU has access to which display ports. For example, I see this if I run `xrandr` with only the Intel GPU enabled:
+If your laptop has a BIOS setting that allows you to configure the currently active GPUs, then your laptop definitely isn't _muxless_, and it becomes possible to conclusively know which GPU has access to which display ports. For example, I see this if I run `xrandr` with only the Intel GPU enabled:
 
 ``` bash
 Screen 0: minimum 320 x 200, current 3520 x 1080, maximum 32767 x 32767
@@ -70,21 +70,21 @@ DP-0 disconnected (normal left inverted right x axis y axis)
 DP-1 disconnected (normal left inverted right x axis y axis)
 DP-2 disconnected (normal left inverted right x axis y axis)
 ```
-Here, the internal display and the VGA port are accessible by both GPUs, whereas the DVI and mini-display ports are only accessible to the Nvidia GPU. Again, each laptop does it differently.
+Here, the internal display and the VGA port are accessible by both GPUs, whereas the DVI and mini-display ports are solely accessible by the Nvidia GPU. Again, each laptop does it differently.
 
 
 ## Understanding Optimus
 
 So, if an Optimus laptop has an Intel and an Nvidia GPU, what actually is Optimus? Well, it's Nvidia's name for a proprietary piece of software that is capable of dynamically switching which GPU controls which active display at any time. There are a number of ways this dynamic switching can occur:
 
-  1. Some laptops have a hardware _multiplexer_ (or mux) that allows both of the GPUs to access the same set of display ports, and there is speculation that Optimus may dynamically switch the hardware mux to transfer control of a display port from one GPU to another, assuming Windows can even support this.
+  1. Some laptops have a hardware _multiplexer_ (or mux) that allows both of the GPUs to access the same set of display ports, and there is speculation that the Optimus software may also dynamically switch the hardware mux to transfer control of a display port from one GPU to another, assuming Windows can even support this.
   2. For laptops that don't have a hardware mux, or where not all display ports are muxed, then there are two forms of software muxing that can be used:
     1. The first is to have the less powerful GPU off-load 3D rendering to a more powerful GPU for a particular application.
-    2. The second is to have one GPU use another GPU to provide it access to display ports it otherwise wouldn't be able to use.
+    2. The second is to have one GPU use another GPU to provide it access to display ports it otherwise wouldn't be able to interface with.
 
 The first of the two software muxing approaches allows a less powerful GPU to be used while mobile, while still making use of a more powerful GPU when actually needed, and the second is what makes it possible to use four displays at once, even though desktops rendered by X Server must render to a primary GPU.
 
-The Linux version of Optimus is called Optimus Prime (a reference to Transformers), and provides limited forms of the same 3 types of muxing:
+The Linux version of Optimus is called Optimus Prime (a reference to Transformers), and provides limited forms of all three of these types of muxing:
 
   1. Switcheroo is the Optimus Prime way of switching the hardware mux, but can only be used after `vga_switcheroo` has become available, but before the _boot-splash_ (e.g. Plymouth) or the _display-manager_ (e.g. LightDM) have started.
   2. `xrandr --setprovideroffloadsink <offload-to> <offload-from>` is the Optimus Prime way of offloading rendering from a given GPU to some other GPU, for any programs started with `DRI_PRIME` set to `1`.
@@ -117,7 +117,7 @@ If you've done any on-line search with the keywords 'Optimus' and 'Linux' you wi
   * Bumblebee
   * Nvidia Prime
 
-Both of these are dependent on the proprietary Nvidia driver and do things their own way, rather than the Linux way. Consequently, both technologies prevent 3 or 4 concurrent displays being used. Despite that, it's worth understanding what these technologies provide, and how they work.
+Both of these are dependent on the proprietary Nvidia driver, and do things their own way rather than the Linux way. Consequently, both technologies prevent 3 or 4 concurrent displays being used. Despite that, it's worth understanding what these technologies provide, and how they work.
 
 The older Bumblebee project provides per-program off-loading of 3D rendering, equivalent to the `xrandr --setprovideroffloadsink` command, but more limited in that only the Intel GPU can off-load to the NVidia GPU. It's been a real boon because it doesn't require RandR 1.4 compatible graphics drivers, and so for a long time was the only option available.
 
@@ -127,23 +127,25 @@ I suspect that Nvidia Prime is able to do what it does by using the RandR 1.4 fe
 
 > The NVIDIA driver currently only supports the Source Output capability. It does not support render offload and cannot be used as an output sink.
 
+Ultimately, if gaming is important to you and/or you don't need to drive lots of monitors, you are better off using one of these solutions for the time being.
+
 
 ### The Optimus Prime Way
 
 So, to be able run multiple external monitors requires XRandR 1.4, ideally Linux kernel 3.13 or greater, and RandR 1.4 compatible graphics drivers for both the Intel and Nvidia GPUs. This rules out the proprietary Nvidia driver because of it's very limited support for RandR 1.4.
 
-This leaves the open-source Nouveau driver as the only option available to us. Before proceeding it's worth understanding the down-sides to using that driver:
+Therefore, this leaves the open-source Nouveau driver as the only option available to us. Before proceeding though, it's worth understanding the down-sides to using that driver:
 
   * It doesn't support dynamic power management, so it consumes much more power than it should, running your battery down faster.
-  * The lack of dynamic power management also causes it to run much hotter than it should.
+  * The lack of dynamic power management also causes it to run much hotter than it should, which may shorten the life of your batteries if unchecked.
   * The lack of dynamic power management also means that it runs at a much slower speed than it otherwise could, and for 3D rendering (e.g. games) it [performs at about 1/5th of the speed](http://www.phoronix.com/scan.php?page=article&item=nvidia_2d_openclose&num=1) of the proprietary driver.
   * It is reverse engineered without NVidia's help, so may be buggy.
 
-Although this sounds terrible, it need not be too bad for non-gamers provided it can be made to work since, it allows the Intel GPU to be used when mobile, where the Nvidia GPU is only co-opted in at the user's request, and allows both GPUs to be used when docked, when power usage is of no concern anyway.
+Although this sounds terrible, it need not be too bad for non-gamers provided it can be made to work since, it allows the Intel GPU to be used when mobile, where the Nvidia GPU is only co-opted in at the user's request, and it allows both GPUs to be used when docked, when power usage is of no concern anyway.
 
-### Single Monitor
+### Single Monitor Usage
 
-Assuming you have both GPUs enabled, and you are using the Nouveau driver, try running this command (in Ubuntu 14.04 it seems to have been run automatically):
+Assuming you have both GPUs enabled, and you are using the Nouveau driver, try running this command (_in Ubuntu 14.04 it seems to have been run automatically_):
 
 ``` bash
 xrandr --setprovideroffloadsink nouveau Intel
@@ -197,7 +199,7 @@ temp1:            N/A  (high = +95.0°C, hyst =  +3.0°C)
                        (emerg = +135.0°C, hyst =  +5.0°C)
 ```
 
-Notice how the 'coretemp-isa-0000' temperatures are both below 50°C, and how the 'nouveau-pci-0100' temperature is showing as _N/A_, as it isn't even switched on. If I now run the command:
+Notice how the 'coretemp-isa-0000' temperatures are all below 50°C, and how the 'nouveau-pci-0100' temperature is showing as _N/A_, as it isn't even switched on. If I now run the command:
 
 ``` bash
 DRI_PRIME=0 glxgears
@@ -244,46 +246,48 @@ temp1:        +58.0°C  (high = +95.0°C, hyst =  +3.0°C)
                        (emerg = +135.0°C, hyst =  +5.0°C)
 ```
 
-Fortunately, about ~8 seconds after closing the `glxgears` program the 'nouveau-pci-0100' reverts to showing _N/A_, as it's switched itself off again. This ability to [automatically power the GPU down](http://www.phoronix.com/scan.php?page=news_item&px=MTQ0ODM) when unused was added in Linux 3.12, with Nouveau driver support being added in 3.13, which is why we need that version of the kernel, in addition to RandR 1.4 kernel and driver support.
+Fortunately, about ~8 seconds after closing the `glxgears` program the 'nouveau-pci-0100' reverts to showing _N/A_, as it's switched itself off again. This ability to [automatically power the GPU down](http://www.phoronix.com/scan.php?page=news_item&px=MTQ0ODM) when unused was added in Linux 3.12, with Nouveau driver support being added in 3.13, which is why that version of the kernel is preferable, in addition to RandR 1.4 kernel and driver support.
 
 So, even though the Nouveau driver doesn't currently support dynamic power management, it will usually be switched off anyway, leaving your battery untouched. When you need it though, it's still there for you.
 
-This is already more than adequate for my needs, but it's good to know that experimental support for [dynamic power management in Nouveau](http://www.phoronix.com/scan.php?page=article&item=nouveau_try_linux316&num=1) landed in Kernel 3.16, and while it's not ready for mainstream use, further progress does seem to be being made in that direction.
+This is already more than adequate for my needs, but it's good to know that experimental support for [dynamic power management in Nouveau](http://www.phoronix.com/scan.php?page=article&item=nouveau_try_linux316&num=1) landed in Kernel 3.16, and while it's not ready for mainstream use, progress is being made.
 
-The one negative I see at this point from having both GPUs enabled (I'm running Gnome Ubuntu 14.04 BTW) is that I get a System Error dialog immediately after logging in, followed by another one about a minute later, but then things work fine after this.
+Even before we attempt to use multiple monitors, I'm already seeing negative consequences to having both GPUs enabled though; I get a System Error dialog immediately after logging in, followed by another one about a minute later, and experience reliability problems when docking and undocking.
 
 
-### Multiple Monitors
+### Multiple Monitor Usage
 
-To allow all four displays to be accessed, try running this command (in Ubuntu 14.04 it seems to have been run automatically):
+To allow all four displays to be accessed, try running this command (_in Ubuntu 14.04 it seems to have been run automatically_):
 
 ``` bash
 xrandr --setprovideroutputsource Intel nouveau
 xrandr --auto
 ```
 
-Because we are using RandR 1.4 compatible drivers, when we dock the laptop to the external monitors it all just works, ... right? Well, not really.
+Because we are using RandR 1.4 compatible drivers, when we dock the laptop to the external monitors, it all just works right? Well, ... not really.
 
 Here are the issues I see in Gnome Ubuntu 14.04:
 
   1. Driving more than 2 displays causes the displays to go screwy at login, so after each login I have to open the Displays control-panel and re-configure.
   2. Rendering to monitors connected via ports controlled by the Nvidia GPU is unusably slow, with visual artifacts being left around as windows are moved.
-  3. Displays connected via Nvidia controlled ports can't be made the primary desktop, which for me means that the primary desktop can't be a monitor connected via DVI, but must instead be the laptop display or a monitor connected via VGA.
+  3. Displays connected via Nvidia controlled ports can't be made the primary desktop, which for me means that the primary desktop can't be a monitor connected via DVI, but must instead be the laptop display or a monitor connected via VGA (this is a big issue for Gnome 3 users such as myself).
 
-Issue #1 is very specific to either 14.04, my laptop, or both, as I haven't seen it in other distributions. Issue #2 also happens in Fedora 20 and Fedora 21 (see [this excellent blog](http://negativo17.org/complex-setup-with-nvidia-optimus-nouveau-prime-on-fedora-20/) for example), but I happen to know that it **works just fine in Fedora 19**.
+Issue #1 seems to be specific to Ubuntu 14.04, as I haven't seen it in other versions or distributions. Issue #2 also happens in Fedora 20 and Fedora 21 (see [this excellent blog](http://negativo17.org/complex-setup-with-nvidia-optimus-nouveau-prime-on-fedora-20/) for example), but I happen to know that it **works just fine in Fedora 19**.
 
 For me, there is also a [regression in Ubuntu 14.10](https://bugs.launchpad.net/ubuntu/+bug/1388647) that means I can't even begin to test things to see if the situation has improved there, which is a shame since Ubuntu 14.10 includes [Nouveau 1.0.11](http://www.phoronix.com/scan.php?page=news_item&px=MTc3ODA), which includes 2D hardware acceleration and numerous bug fixes.
 
 So, right now, AFAICT, if you want to drive 4 displays with Optimus you are limited to Fedora 19! And, although Optimus Prime is the only way to go to support multiple monitors, it doesn't seem to work well enough in any of the more recent Linux distributions.
 
-If you do decide to go with Fedora 19 then you need to be aware that it includes Linux kernel 3.9, which is much less than the 3.13 I said you ideally needed. The upshot of this is that you will be in charge of automatically enabling and disabling the Nvidia GPU as it's not done automatically. Also, I noticed that docking and un-docking was more buggy with the earlier versions of the drivers in Fedora 19, so that I often had to restart my machine after docking or un-docking.
+If you do decide to go with Fedora 19 then you need to be aware that it includes Linux kernel 3.9, which is much less than the 3.13 I said you ideally needed. The upshot of this is that you will be in charge of automatically powering up and powering down the Nvidia GPU, as it's not done automatically. Apart from that, although I also found some instabilities around docking and undocking, I eventually found ways of doing this (un-dock while the laptop lid is open, dock while the laptop lid is closed, but then very quickly open) that kept problems to a minimum.
 
-A colleague of mine at work suspects that Fedora 19 works better due to a change in Gnome that allows small sub-sections of window to be updated for better performance, and which is actually causing a performance degradation when using an _output-source_ on a foreign GPU. It would be really great if this change could be isolated or bisected, so that the wider Linux community could be made aware of it.
+Although one of my colleagues at work has his suspicions as to exactly why Fedora 19 works and Fedora 20 doesn't, what we really need is somebody with the relevant Linux skilz to `git bisect` this issue, so that the regression can be identified, reported and ultimately fixed.
 
 
 ### VGA Switcheroo
 
-If you do decide to go with Fedora 19, you will need to become better aquainted with `vga_switcheroo`, so that you can enable and disable the discrete GPU. You can check the current status using the command:
+If you do decide to go with Fedora 19, you will need to become better acquainted with `vga_switcheroo`, so that you can enable and disable the discrete GPU.
+
+You can check the current status of both GPUs using the command:
 
 ``` bash
 sudo cat /sys/kernel/debug/vgaswitcheroo/switch
@@ -293,10 +297,10 @@ For me this generates output like this:
 
 ``` bash
 0:IGD:+:Pwr:0000:00:02.0
-1:DIS: :DyfOff:0000:01:00.0
+1:DIS: :DynOff:0000:01:00.0
 ```
 
-but on earlier kernels that don't have dynamic power management, you would instead see something like:
+but on earlier kernels that don't have dynamic power management, you would instead see something like this:
 
 ``` bash
 0:IGD:+:Pwr:0000:00:02.0
@@ -315,13 +319,19 @@ and disable it with the command:
 sudo echo OFF > /sys/kernel/debug/vgaswitcheroo/switch
 ```
 
-The switcheroo also has commands (e.g. `IGD` and `DIS`) to switch the primary GPU, but these commands can only be used after `vga_switcheroo` has become available, yet before the _boot-splash_ (e.g. Plymouth) or the _display-manager_ (e.g. LightDM) have started. This offers almost no opportunity to actually configure it, since even `rc.local` (which is run before the _display-manager_ is started) is run while the _boot-splash_ is running.
+`vga_switcheroo` also has commands (e.g. `IGD` and `DIS`) to switch the primary GPU, but these commands can only be used after it has become available, yet before the _boot-splash_ (e.g. Plymouth) or the _display-manager_ (e.g. LightDM) have started. This offers almost no opportunity to actually configure it, since even `rc.local` (which is run before the _display-manager_ has started) is run while the _boot-splash_ is running.
 
 Additionally, for many, the Nouveau driver doesn't work when configured as the primary GPU, and users instead see a black or frozen screen when attempting to configure it this way. If you'd still like to at least see if your laptop works when you make Nvidia the primary GPU, you'll find [these instructions](http://askubuntu.com/questions/87489/vgaswitcheroo-not-selecting-discrete-card/97253#97253) really helpful.
 
 
 ## Conclusion
 
-If you've read this far then I hope you've found all of this information useful, even if you didn't manage to achieve the multi-monitor set-up you've been looking for. Although we also seem to be going backwards in some respects (the Nvidia output-source performance regression and the [Ubuntu 14.10 Optimus regression](https://bugs.launchpad.net/ubuntu/+bug/1388647)), there have also been lots of positive steps forward too.
+If you've read this far then I hope you've found all of this information useful, even if you didn't manage to achieve the multi-monitor set-up you've been looking for. Although we also seem to be going backwards in some respects (the Nvidia output-source performance regression and the [Ubuntu 14.10 Optimus regression](https://bugs.launchpad.net/ubuntu/+bug/1388647)), there have also been lots of positive steps forward, for example:
 
-For example, Ubuntu 14.10 has almost all of the requisite parts (apart from a 3.17 kernel) necessary to do DRI3 3D render off-loading, instead of DRI2 render off-loading, which fixes the tearing issues many have run into. Also, Ubuntu 14.10 has the experimental power-management changes to Nouveau (within the 3.16 kernel), which should eventually lead to better performance and better battery usage.
+  1. [Linux Kernel 3.12](http://www.phoronix.com/scan.php?page=news_item&px=MTQ0ODM) is able to automatically power down the discrete GPU when not in use.
+  2. [Linux Kernel 3.16](http://www.phoronix.com/scan.php?page=article&item=nouveau_try_linux316&num=1) contains experimental power management code for Nouveau.
+  3. [Linux Kernel 3.17](http://nouveau.freedesktop.org/wiki/Optimus/) contains DRI3 support, which allows more performant 3D render off-loading.
+  4. [Nouveau 1.0.11](http://www.phoronix.com/scan.php?page=news_item&px=MTc3ODA) provides hardware accelerated 2D rendering.
+  5. [Nvidia 319.12 Beta](http://www.phoronix.com/scan.php?page=news_item&px=MTM0NzE) adds limited support for RandR 1.4.
+
+Ubuntu 14.10 even has almost all of the requisite parts (apart from a 3.17 kernel) to provide very good multi-monitor support, so that if we could rally around the regressions that still exist, we might hopefully expect that Ubuntu 15.04 works a treat!
