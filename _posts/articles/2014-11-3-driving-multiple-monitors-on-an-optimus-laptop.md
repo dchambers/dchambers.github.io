@@ -343,4 +343,4 @@ Additionally, for many, the Nouveau driver doesn't work when configured as the p
 
 If you've read this far then I hope you've found all of this information useful, even if you still didn't manage to achieve the multi-monitor set-up you've been looking for. Although we seem to have gone backwards in some respects (the [Gnome 3.10 regression](https://bugzilla.gnome.org/show_bug.cgi?id=739865) and the [Ubuntu 14.10 Optimus regression](https://bugs.launchpad.net/ubuntu/+bug/1388647)), there have been more positive steps forward, and things look set to keep getting better.
 
-After lots of searching, I've finally found a workable stop-gap that works for me, and hopefully you're able to find the same.
+After lots of searching, I've finally found a workable solution that works for me, and hopefully you're able to find the same.
