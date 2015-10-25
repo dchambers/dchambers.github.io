@@ -38,7 +38,7 @@ Generically, structure tests are written like this:
 
 Here's a concrete example:
 
-```jsx
+```js
 it('only renders a header when there are no items in the list', function() {
     // given
     var todoApp = $(<TodoApp model={model} router={router}/>);
@@ -60,7 +60,7 @@ Behaviour tests have a similar, but slightly longer generic form:
 
 Here's another example:
 
-```jsx
+```js
 it('allows an item to be added to the list', function() {
     // given
     var todoApp = $(<TodoApp model={model} router={router}/>);
@@ -89,7 +89,7 @@ Binding tests allow us to verify whether a particular handler will be invoked wh
 
 Here's a final example:
 
-```jsx
+```js
 it('allows the user to add items', function() {
     // given
     var handleTodoAdded = sinon.spy();
