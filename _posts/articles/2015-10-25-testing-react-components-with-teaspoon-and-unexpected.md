@@ -1,0 +1,157 @@
+---
+layout: post
+title: "Testing React Components With Teaspoon & Unexpected"
+modified:
+categories: articles
+excerpt:
+tags: [react, testing, bdd, acceptance-testing]
+image:
+  feature:
+date: 2014-11-03T21:38:00-00:00
+---
+
+This article shows you how you can use [teaspoon](https://www.npmjs.com/package/teaspoon) and [unexpected](http://unexpected.js.org/) to test your React components in a way that combines the advantages of unit testing with the advantages of acceptance testing. So we're clear on what that means, let's list some of the advantages of unit testing:
+
+  * Tests are fast
+  * Tests are reliable
+  * Tests are easy to write
+
+and some of the advantages of acceptance testing:
+
+  * Tests verify the behaviour you're actually interested in.
+  * Tests are easy to read, and comprehend.
+  * Tests support aggressive re-factoring since they verify behaviour rather than private implementation detail.
+
+In this article we'll be extending the [two axes of testing](http://reactkungfu.com/2015/07/approaches-to-testing-react-components-an-overview/#two_axes_of_testing_components) defined by Martin Grzywaczewski, in his [Approaches to testing React components](http://reactkungfu.com/2015/07/approaches-to-testing-react-components-an-overview/) article, by adding a third type of testing. This gives us three types of test in total:
+
+  * Structure Tests (_shallow rendering_)
+  * Behaviour Tests (_shallow rendering_)
+  * Binding Tests (_full rendering_)
+
+To demonstrate this approach to testing, we'll use a fork of the [React TodoMVC App](https://github.com/dchambers/react-todomvc) to provide concrete test examples.
+
+## Structure Tests
+
+Generically, structure tests are written like this:
+
+> Given _input-form_, then _output-form_.
+
+Here's a concrete example:
+
+```jsx
+it('only renders a header when there are no items in the list', function() {
+    // given
+    var todoApp = $(<TodoApp model={model} router={router}/>);
+
+    // then
+    expect(todoApp.shallowRender()[0], 'to have rendered with all children',
+        <Container componentName="TodoApp">
+            <TodoHeader/>
+        </Container>
+    );
+});
+```
+
+## Behaviour Tests
+
+Behaviour tests have a similar, but slightly longer generic form:
+
+> Given _input-form_, when _behaviour-handler-invoked_, then _output-form_.
+
+Here's another example:
+
+```jsx
+it('allows an item to be added to the list', function() {
+    // given
+    var todoApp = $(<TodoApp model={model} router={router}/>);
+
+    // when
+    todoApp.shallowRender().find('TodoHeader')[0].props.onTodoAdded('Item #1');
+
+    // then
+    expect(todoApp.shallowRender()[0], 'to have rendered with all children',
+        <Container componentName="TodoApp">
+            <TodoHeader/>
+            <TodoItems activeTodoCount={1}>
+                <TodoItem title="Item #1" completed={false}/>
+            </TodoItems>
+            <TodoFooter count={1} completedCount={0} nowShowing="all"/>
+        </Container>
+    );
+});
+```
+
+## Binding Tests
+
+Binding tests allow us to verify whether a particular handler will be invoked when some user behaviour occurs. Generically, they have the form:
+
+> Given _input-form_, when _user-behaviour_, then _behaviour-handler-invoked_.
+
+Here's a final example:
+
+```jsx
+it('allows the user to add items', function() {
+    // given
+    var handleTodoAdded = sinon.spy();
+    var todoHeader = $(<TodoHeader onTodoAdded={handleTodoAdded}/>);
+
+    // when
+    var inputBox = todoHeader.render().find('input.new-todo');
+    inputBox.dom().value = 'Item #1';
+    inputBox.trigger('keyDown', {key: 'Enter', keyCode: 13, which: 13});
+
+    // then
+    sinon.assert.calledWith(handleTodoAdded, 'Item #1');
+});
+```
+
+## Making Your App Testable
+
+You'll need to observe the following guidelines if you want to test your app in this way:
+
+  1. Complex components should express themselves using semantically rich child components rather than DOM elements.
+  2. The call-backs on the child components should be semantic too, and divorced from DOM concerns.
+  3. The props on the child components should only accept simple types so we can use [unexpected](http://unexpected.js.org/) to test the output form.
+  4. We should inject into the top-level component any objects that may require different implementations in test, or that are required due to the limitations of the test environment (e.g. the router in the [TodoMVC App](https://github.com/dchambers/react-todomvc)).
+  5. Parent components should not pre-bind arguments to the call-back functions they provide to child components &mdash; any arguments needed within the parent component's call-back should be provided by the child component, causing these arguments to become testable within the binding tests.
+  6. If you choose to write your components in ES6 you will need to ensure that any classes or stateless functions have the same name as the component, otherwise your [teaspoon](https://www.npmjs.com/package/teaspoon) queries won't work.
+
+## Performance
+
+Tests written this way to seem to execute very quickly. To give you an idea, here are the performance figures for running the complete set of tests on my machine:
+
+```
+  TodoMVC App
+    UI bindings
+      ✓ allows the user to add items (68ms)
+      ✓ does not allow the user to add emtpy items (26ms)
+      ✓ allows the user to check active items (27ms)
+      ✓ allows the user to destroy items (17ms)
+      ✓ allows the user to mark all items as completed (19ms)
+      ✓ allows the user to clear completed items (16ms)
+      ✓ allows the user to view all items (16ms)
+      ✓ allows the user to view active items (16ms)
+      ✓ allows the user to view completed items (11ms)
+    when the Todo list start off empty
+      ✓ only renders a header when there are no items in the list (5ms)
+      ✓ allows an item to be added to the list (5ms)
+    when the Todo list starts off with a single active item
+      ✓ starts off with a completed count of zero (1ms)
+      ✓ updates the summary information when an items checkbox is ticked (2ms)
+      ✓ removes the items list and footer when the last item is removed (1ms)
+      ✓ updates the footer information when the completed filter is clicked (3ms)
+      ✓ adds new items to the bottom of the list (2ms)
+    when the Todo list contains multiple items
+      ✓ marks all items as done when the toggle-all arrow is clicked (3ms)
+    when the Todo list contains a mixture of completed and active items
+      ✓ shows all items by default (2ms)
+      ✓ does not show active items when the completed view is used (1ms)
+      ✓ does not show completed items when the active view is used (2ms)
+      ✓ removes only completed items when clear-completed is clicked (2ms)
+
+  Todo Footer
+    - does not display the clear all completed items button if there are no completed items
+    ✓ displays the clear all completed items button if there are completed items (2ms)
+```
+
+Happy testing!
