@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Testing React Components With Teaspoon & Unexpected"
+title: "Testing React Components with Teaspoon & Unexpected"
 modified:
 categories: articles
 excerpt:
@@ -19,7 +19,7 @@ This article shows you how you can use [teaspoon](https://www.npmjs.com/package/
 and some of the advantages of acceptance testing:
 
   * Tests verify the behaviour you're actually interested in.
-  * Tests are easy to read, and comprehend.
+  * Tests are easy to read and comprehend.
   * Tests support aggressive re-factoring since they verify behaviour rather than private implementation detail.
 
 In this article we'll be extending the [two axes of testing](http://reactkungfu.com/2015/07/approaches-to-testing-react-components-an-overview/#two_axes_of_testing_components) defined by Martin Grzywaczewski, in his [Approaches to testing React components](http://reactkungfu.com/2015/07/approaches-to-testing-react-components-an-overview/) article, by adding a third type of testing. This gives us three types of test in total:
@@ -34,7 +34,7 @@ To demonstrate this approach to testing, we'll use a fork of the [React TodoMVC 
 
 Generically, structure tests are written like this:
 
-> Given _input-form_, then _output-form_.
+> **Given** _input-form_ **then** _output-form_.
 
 Here's a concrete example:
 
@@ -56,7 +56,7 @@ it('only renders a header when there are no items in the list', function() {
 
 Behaviour tests have a similar, but slightly longer generic form:
 
-> Given _input-form_, when _behaviour-handler-invoked_, then _output-form_.
+> **Given** _input-form_ **when** _behaviour-handler-invoked_ **then** _output-form_.
 
 Here's another example:
 
@@ -85,7 +85,7 @@ it('allows an item to be added to the list', function() {
 
 Binding tests allow us to verify whether a particular handler will be invoked when some user behaviour occurs. Generically, they have the form:
 
-> Given _input-form_, when _user-behaviour_, then _behaviour-handler-invoked_.
+> **Given** _input-form_ **when** _user-behaviour_ **then** _behaviour-handler-invoked_.
 
 Here's a final example:
 
@@ -116,9 +116,11 @@ You'll need to observe the following guidelines if you want to test your app in 
   5. Parent components should not pre-bind arguments to the call-back functions they provide to child components &mdash; any arguments needed within the parent component's call-back should be provided by the child component, causing these arguments to become testable within the binding tests.
   6. If you choose to write your components in ES6 you will need to ensure that any classes or stateless functions have the same name as the component, otherwise your [teaspoon](https://www.npmjs.com/package/teaspoon) queries won't work.
 
+I would encourage you to skim read the entire set of [React TodoMVC App tests ](https://github.com/dchambers/react-todomvc/tree/master/test) to better understand the effects of these guidelines in practice.
+
 ## Performance
 
-Tests written this way to seem to execute very quickly. To give you an idea, here are the performance figures for running the complete set of tests on my machine:
+Tests written this way to seem to execute very quickly. To give you an idea, here are the performance figures when running the complete set of tests on my machine:
 
 ```
   TodoMVC App
@@ -154,4 +156,4 @@ Tests written this way to seem to execute very quickly. To give you an idea, her
     ✓ displays the clear all completed items button if there are completed items (2ms)
 ```
 
-Happy testing!
+So, apart from the binding tests, everything is super zippy. Happy testing!
