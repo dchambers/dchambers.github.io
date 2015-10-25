@@ -7,7 +7,7 @@ excerpt:
 tags: [react, testing, bdd, acceptance-testing]
 image:
   feature:
-date: 2014-11-03T21:38:00-00:00
+date: 2015-10-25T13:18:00-00:00
 ---
 
 This article shows you how you can use [teaspoon](https://www.npmjs.com/package/teaspoon) and [unexpected](http://unexpected.js.org/) to test your React components in a way that combines the advantages of unit testing with the advantages of acceptance testing. So we're clear on what that means, let's list some of the advantages of unit testing:
