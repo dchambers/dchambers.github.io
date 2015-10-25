@@ -9,7 +9,7 @@ image:
   creditlink: http://en.wikipedia.org/wiki/File:Tower_bridge_London_Twilight_-_November_2006.jpg
 ---
 
-Techical Lead at Caplin Systems Ltd in London.
+Client-Side Architect at Caplin Systems Ltd in London.
 
 
 ### More Information
