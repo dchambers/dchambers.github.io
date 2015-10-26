@@ -116,7 +116,7 @@ You'll need to observe the following guidelines if you want to test your app in 
   5. Parent components should not pre-bind arguments to the call-back functions they provide to child components &mdash; any arguments needed within the parent component's call-back should be provided by the child component, causing these arguments to become testable within the binding tests.
   6. If you choose to write your components in ES6 you will need to ensure that any classes or stateless functions have the same name as the component, otherwise your [teaspoon](https://www.npmjs.com/package/teaspoon) queries won't work.
 
-I would encourage you to skim read the entire set of [React TodoMVC App tests ](https://github.com/dchambers/react-todomvc/tree/master/test) to better understand the effects of these guidelines in practice.
+I would encourage you to skim read the entire set of [React TodoMVC App tests ](https://github.com/dchambers/react-todomvc/tree/master/test) to get a better feel for what this testing style looks like in practice.
 
 ## Performance
 
@@ -156,4 +156,14 @@ Tests written this way to seem to execute very quickly. To give you an idea, her
     ✓ displays the clear all completed items button if there are completed items (2ms)
 ~~~
 
-So, apart from the binding tests, everything is super zippy. Happy testing!
+So, apart from the binding tests, everything is super zippy.
+
+## Conclusion
+
+Tests written like this combine the benefits of unit and acceptance testing, while avoiding the potential disadvantages of acceptance testing:
+
+  1. Tests are no more costly to write than unit tests.
+  2. Tests aren't prohibitively expensive to maintain due to unreliability &mdash; think [Selenium](http://www.seleniumhq.org/).
+  3. Tests aren't obscured by an attempt to use natural language so that they can be understood by non-technical domain experts &mdash; think [Cucumber](https://cucumber.io/) or [FitNesse](http://www.fitnesse.org/).
+
+Happy testing!
