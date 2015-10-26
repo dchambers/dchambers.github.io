@@ -38,7 +38,7 @@ Generically, structure tests are written like this:
 
 Here's a concrete example:
 
-```js
+~~~js
 it('only renders a header when there are no items in the list', function() {
     // given
     var todoApp = $(<TodoApp model={model} router={router}/>);
@@ -50,7 +50,7 @@ it('only renders a header when there are no items in the list', function() {
         </Container>
     );
 });
-```
+~~~
 
 ## Behaviour Tests
 
@@ -60,7 +60,7 @@ Behaviour tests have a similar, but slightly longer generic form:
 
 Here's another example:
 
-```js
+~~~js
 it('allows an item to be added to the list', function() {
     // given
     var todoApp = $(<TodoApp model={model} router={router}/>);
@@ -79,7 +79,7 @@ it('allows an item to be added to the list', function() {
         </Container>
     );
 });
-```
+~~~
 
 ## Binding Tests
 
@@ -89,7 +89,7 @@ Binding tests allow us to verify whether a particular handler will be invoked wh
 
 Here's a final example:
 
-```js
+~~~js
 it('allows the user to add items', function() {
     // given
     var handleTodoAdded = sinon.spy();
@@ -103,7 +103,7 @@ it('allows the user to add items', function() {
     // then
     sinon.assert.calledWith(handleTodoAdded, 'Item #1');
 });
-```
+~~~
 
 ## Making Your App Testable
 
@@ -122,7 +122,7 @@ I would encourage you to skim read the entire set of [React TodoMVC App tests ](
 
 Tests written this way to seem to execute very quickly. To give you an idea, here are the performance figures when running the complete set of tests on my machine:
 
-```
+~~~
   TodoMVC App
     UI bindings
       ✓ allows the user to add items (68ms)
@@ -154,6 +154,6 @@ Tests written this way to seem to execute very quickly. To give you an idea, her
   Todo Footer
     - does not display the clear all completed items button if there are no completed items
     ✓ displays the clear all completed items button if there are completed items (2ms)
-```
+~~~
 
 So, apart from the binding tests, everything is super zippy. Happy testing!

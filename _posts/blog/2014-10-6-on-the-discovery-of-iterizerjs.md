@@ -24,21 +24,21 @@ As it happens, ES6 adds support for both iterators and generators, and it's alre
 
 Because Python's `range()` function is so useful, there were actually a number of implementations on the web already, so I grabbed one and continued on my way. With it, the solution to the first problem became:
 
-``` javascript
+~~~js
 Array.from(range(999)).filter(function(n) {
 	return (((n % 3) == 0) || ((n % 5) == 0));
 }).join(', ');
-```
+~~~
 
 This isn't too pretty, and I don't feel like I'm writing more concise code. I feel like I'm writing ugly, hard to read code. The problem is ES6's `Array.from()` method, because it's a static method that I have to provide the context to, rather than being immediately available on all _iterable_ objects.
 
 To make myself feel cleaner again, I patch `Array.from` directly onto `Object.prototype.toArray` as a non-enumerable property, and enjoy the improved view:
 
-``` javascript
+~~~js
 range(999).toArray().filter(function(n) {
 	return (((n % 3) == 0) || ((n % 5) == 0));
 }).join(', ');
-```
+~~~
 
 
 ## The Array.from() bridging anti-pattern
@@ -55,9 +55,9 @@ increasing re-use at the functional level.
 
 When we later encounter problem 10 from Project Euler ('Find the sum of all the primes below two million'), our intuitions are confirmed when we can solve the problem with this single line of code:
 
-``` javascript
+~~~js
 primes().limit(lessThan(2000000)).sum();
-```
+~~~
 
 The downside here being, when it becomes this simple to solve the problems, it becomes no challenge at all!
 

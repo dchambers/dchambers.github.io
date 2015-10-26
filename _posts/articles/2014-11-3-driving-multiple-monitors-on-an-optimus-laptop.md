@@ -24,7 +24,7 @@ To start with, it's worth describing what an Optimus laptop actually is. Really,
 
 If you run the `xrandr` command you'll see the list of display ports available. On my work laptop for example (a Lenovo T430), I see this:
 
-``` bash
+~~~bash
 Screen 0: minimum 320 x 200, current 1600 x 900, maximum 32767 x 32767
 LVDS1 connected primary 1600x900+0+0 (normal left inverted right x axis y axis) 310mm x 174mm
    1600x900       60.0*+
@@ -41,13 +41,13 @@ VGA-1-2 disconnected
 DP-1-1 disconnected
 DP-1-2 disconnected
 DP-1-3 disconnected
-```
+~~~
 
 Unfortunately, the `xrandr` command doesn't explicitly state which display ports are connected to which GPU, but you can pretty much figure it out by all the extra hyphens added to the port names for the discrete GPU (e.g. `LVDS-1-2` & `VGA-1-2`).
 
 If your laptop has a BIOS setting that allows you to configure the currently active GPUs, then your laptop definitely isn't _muxless_, and it becomes possible to conclusively know which GPU has access to which display ports. For example, I see this if I run `xrandr` with only the Intel GPU enabled:
 
-``` bash
+~~~bash
 Screen 0: minimum 320 x 200, current 3520 x 1080, maximum 32767 x 32767
 LVDS1 connected 1600x900+0+0 (normal left inverted right x axis y axis) 310mm x 174mm
    1600x900       60.0*+
@@ -59,11 +59,11 @@ LVDS1 connected 1600x900+0+0 (normal left inverted right x axis y axis) 310mm x 
    640x480        59.9
 VGA1 disconnected (normal left inverted right x axis y axis)
 VIRTUAL1 disconnected (normal left inverted right x axis y axis)
-```
+~~~
 
 versus this when I have only the Nvidia GPU enabled:
 
-``` bash
+~~~bash
 Screen 0: minimum 8 x 8, current 3840 x 1080, maximum 16384 x 16384
 VGA-0 disconnected (normal left inverted right x axis y axis)
 LVDS-0 connected (normal left inverted right x axis y axis)
@@ -71,7 +71,7 @@ LVDS-0 connected (normal left inverted right x axis y axis)
 DP-0 disconnected (normal left inverted right x axis y axis)
 DP-1 disconnected (normal left inverted right x axis y axis)
 DP-2 disconnected (normal left inverted right x axis y axis)
-```
+~~~
 Here, the internal display and the VGA port are accessible by both GPUs, whereas the DVI and mini-display ports are solely accessible by the Nvidia GPU. Again, each laptop does it differently.
 
 
@@ -172,39 +172,39 @@ Personally, I've now settled for a mostly flawless experience with Nvidia Prime 
 
 Assuming you have both GPUs enabled, and you are using the Nouveau driver, try running this command (_it may well have been run for you automatically_):
 
-``` bash
+~~~bash
 xrandr --setprovideroffloadsink nouveau Intel
-```
+~~~
 
 After running this command you will continue to use the Intel driver to drive your laptop display, but with the option to make a specific program use the Nvidia driver when you need it. For example, if you run:
 
-``` bash
+~~~bash
 DRI_PRIME=0 glxinfo | grep "OpenGL vendor string"
-```
+~~~
 
 you will see the following:
 
-``` bash
+~~~bash
 OpenGL vendor string: Intel Open Source Technology Center
-```
+~~~
 
 Whereas if you run:
 
-``` bash
+~~~bash
 DRI_PRIME=1 glxinfo | grep "OpenGL vendor string"
-```
+~~~
 
 you will instead see:
 
-``` bash
+~~~bash
 OpenGL vendor string: nouveau
-```
+~~~
 
 **Note:** If this doesn't work and you are using Ubuntu 14.10, this is because there is a [known regression in Ubuntu 14.10](https://bugs.launchpad.net/ubuntu/+bug/1388647) which prevents it from working.
 
 Using the 'lm-sensors' package, running `sensors` causes me to see something like this:
 
-``` bash
+~~~bash
 acpitz-virtual-0
 Adapter: Virtual device
 temp1:        +47.0°C  (crit = +200.0°C)
@@ -224,35 +224,35 @@ Adapter: PCI adapter
 temp1:            N/A  (high = +95.0°C, hyst =  +3.0°C)
                        (crit = +105.0°C, hyst =  +5.0°C)
                        (emerg = +135.0°C, hyst =  +5.0°C)
-```
+~~~
 
 Notice how the 'coretemp-isa-0000' temperatures are all below 50°C, and how the 'nouveau-pci-0100' temperature is showing as _N/A_, as it isn't even switched on. If I now run the command:
 
-``` bash
+~~~bash
 DRI_PRIME=0 glxgears
-```
+~~~
 
 the temperatures stay below 50°C, and I get performance output like this:
 
-``` bash
+~~~bash
 304 frames in 5.0 seconds = 60.641 FPS
-```
+~~~
 
 But if I instead run:
 
-``` bash
+~~~bash
 DRI_PRIME=1 glxgears
-```
+~~~
 
 I then get performance figures like this:
 
-``` bash
+~~~bash
 11209 frames in 5.0 seconds = 2241.788 FPS
-```
+~~~
 
 and the temperature keeps climbing while I leave `glxgears` running, for example:
 
-``` bash
+~~~bash
 Adapter: Virtual device
 temp1:        +58.0°C  (crit = +200.0°C)
 
@@ -271,7 +271,7 @@ Adapter: PCI adapter
 temp1:        +58.0°C  (high = +95.0°C, hyst =  +3.0°C)
                        (crit = +105.0°C, hyst =  +5.0°C)
                        (emerg = +135.0°C, hyst =  +5.0°C)
-```
+~~~
 
 Fortunately, about 8 seconds after closing the `glxgears` program the 'nouveau-pci-0100' reverts to showing _N/A_, as it's switched itself off again. This ability to [automatically power the GPU down](http://www.phoronix.com/scan.php?page=news_item&px=MTQ0ODM) when unused was added in Linux 3.12, with Nouveau driver support being added in 3.13, which is why that version of the kernel is preferable, in addition to RandR 1.4 kernel and driver support.
 
@@ -284,10 +284,10 @@ This will already be more than adequate for most people's needs, but it's good t
 
 To allow all four displays to be accessed, try running this command (_it may well have been run for you automatically_):
 
-``` bash
+~~~bash
 xrandr --setprovideroutputsource Intel nouveau
 xrandr --auto
-```
+~~~
 
 Hopefully this just works for you, but for me when using Gnome Ubuntu 14.04 I saw the following issues:
 
@@ -304,35 +304,35 @@ If you need to work with a pre Linux 3.13 kernel, you will need to become better
 
 You can check the current status of both GPUs using the command:
 
-``` bash
+~~~bash
 sudo cat /sys/kernel/debug/vgaswitcheroo/switch
-```
+~~~
 
 For me this generates output like this:
 
-``` bash
+~~~bash
 0:IGD:+:Pwr:0000:00:02.0
 1:DIS: :DynOff:0000:01:00.0
-```
+~~~
 
 but on earlier kernels that don't have dynamic power management, you would instead see something like this:
 
-``` bash
+~~~bash
 0:IGD:+:Pwr:0000:00:02.0
 1:DIS: :Off:0000:01:00.0
-```
+~~~
 
 With such kernels, you can enable the discrete GPU with the command:
 
-``` bash
+~~~bash
 sudo echo ON > /sys/kernel/debug/vgaswitcheroo/switch
-```
+~~~
 
 and disable it with the command:
 
-``` bash
+~~~bash
 sudo echo OFF > /sys/kernel/debug/vgaswitcheroo/switch
-```
+~~~
 
 `vga_switcheroo` also has commands (e.g. `IGD` and `DIS`) to switch which GPU will act as the primary GPU, but these commands can only be used after it has become available, yet before the _boot-splash_ (e.g. Plymouth) or the _display-manager_ (e.g. LightDM) have started. This offers almost no opportunity to actually configure it, since even the `rc.local` script (which is run before the _display-manager_ has started) is run while the _boot-splash_ is running.
 
