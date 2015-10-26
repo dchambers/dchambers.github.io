@@ -40,15 +40,15 @@ Here's a concrete example:
 
 ~~~js
 it('only renders a header when there are no items in the list', function() {
-    // given
-    var todoApp = $(<TodoApp model={model} router={router}/>);
+  // given
+  let todoApp = $(<TodoApp model={model} router={router}/>);
 
-    // then
-    expect(todoApp.shallowRender()[0], 'to have rendered with all children',
-        <Container componentName="TodoApp">
-            <TodoHeader/>
-        </Container>
-    );
+  // then
+  expect(todoApp.shallowRender()[0], 'to have rendered with all children',
+    <Container componentName="TodoApp">
+      <TodoHeader/>
+    </Container>
+  );
 });
 ~~~
 
@@ -62,22 +62,22 @@ Here's another example:
 
 ~~~js
 it('allows an item to be added to the list', function() {
-    // given
-    var todoApp = $(<TodoApp model={model} router={router}/>);
+  // given
+  let todoApp = $(<TodoApp model={model} router={router}/>);
 
-    // when
-    todoApp.shallowRender().find('TodoHeader')[0].props.onTodoAdded('Item #1');
+  // when
+  todoApp.shallowRender().find('TodoHeader')[0].props.onTodoAdded('Item #1');
 
-    // then
-    expect(todoApp.shallowRender()[0], 'to have rendered with all children',
-        <Container componentName="TodoApp">
-            <TodoHeader/>
-            <TodoItems activeTodoCount={1}>
-                <TodoItem title="Item #1" completed={false}/>
-            </TodoItems>
-            <TodoFooter count={1} completedCount={0} nowShowing="all"/>
-        </Container>
-    );
+  // then
+  expect(todoApp.shallowRender()[0], 'to have rendered with all children',
+    <Container componentName="TodoApp">
+      <TodoHeader/>
+      <TodoItems activeTodoCount={1}>
+        <TodoItem title="Item #1" completed={false}/>
+      </TodoItems>
+      <TodoFooter count={1} completedCount={0} nowShowing="all"/>
+    </Container>
+  );
 });
 ~~~
 
@@ -91,17 +91,17 @@ Here's a final example:
 
 ~~~js
 it('allows the user to add items', function() {
-    // given
-    var handleTodoAdded = sinon.spy();
-    var todoHeader = $(<TodoHeader onTodoAdded={handleTodoAdded}/>);
+  // given
+  let handleTodoAdded = sinon.spy();
+  let todoHeader = $(<TodoHeader onTodoAdded={handleTodoAdded}/>);
 
-    // when
-    var inputBox = todoHeader.render().find('input.new-todo');
-    inputBox.dom().value = 'Item #1';
-    inputBox.trigger('keyDown', {key: 'Enter', keyCode: 13, which: 13});
+  // when
+  let inputBox = todoHeader.render().find('input.new-todo');
+  inputBox.dom().value = 'Item #1';
+  inputBox.trigger('keyDown', {key: 'Enter', keyCode: 13, which: 13});
 
-    // then
-    sinon.assert.calledWith(handleTodoAdded, 'Item #1');
+  // then
+  sinon.assert.calledWith(handleTodoAdded, 'Item #1');
 });
 ~~~
 
@@ -123,37 +123,43 @@ I would encourage you to skim read the entire set of [React TodoMVC App tests ](
 Tests written this way to seem to execute very quickly. To give you an idea, here are the performance figures when running the complete set of tests on my machine:
 
 ~~~
-  TodoMVC App
-    UI bindings
-      ✓ allows the user to add items (68ms)
-      ✓ does not allow the user to add emtpy items (26ms)
-      ✓ allows the user to check active items (27ms)
-      ✓ allows the user to destroy items (17ms)
-      ✓ allows the user to mark all items as completed (19ms)
-      ✓ allows the user to clear completed items (16ms)
-      ✓ allows the user to view all items (16ms)
-      ✓ allows the user to view active items (16ms)
-      ✓ allows the user to view completed items (11ms)
-    when the Todo list start off empty
-      ✓ only renders a header when there are no items in the list (5ms)
-      ✓ allows an item to be added to the list (5ms)
-    when the Todo list starts off with a single active item
-      ✓ starts off with a completed count of zero (1ms)
-      ✓ updates the summary information when an items checkbox is ticked (2ms)
-      ✓ removes the items list and footer when the last item is removed (1ms)
-      ✓ updates the footer information when the completed filter is clicked (3ms)
-      ✓ adds new items to the bottom of the list (2ms)
-    when the Todo list contains multiple items
-      ✓ marks all items as done when the toggle-all arrow is clicked (3ms)
-    when the Todo list contains a mixture of completed and active items
-      ✓ shows all items by default (2ms)
-      ✓ does not show active items when the completed view is used (1ms)
-      ✓ does not show completed items when the active view is used (2ms)
-      ✓ removes only completed items when clear-completed is clicked (2ms)
+TodoMVC App
+  UI bindings
+    ✓ allows the user to add items (32ms)
+    ✓ does not allow the user to add emtpy items (4ms)
+    ✓ allows the user to check active items (11ms)
+    ✓ allows the user to destroy items (7ms)
+    ✓ allows the user to mark all items as completed (9ms)
+    ✓ allows the user to unmark all items as completed (5ms)
+    ✓ allows the user to clear completed items (21ms)
+    ✓ allows the user to view all items (30ms)
+    ✓ allows the user to view active items (13ms)
+    ✓ allows the user to view completed items (11ms)
+  when the Todo list start off empty
+    ✓ only renders a header when there are no items in the list (4ms)
+    ✓ allows an item to be added to the list (4ms)
+  when the Todo list starts off with a single active item
+    ✓ starts off with a completed count of zero (1ms)
+    ✓ updates the summary information when an items checkbox is ticked (2ms)
+    ✓ removes the items list and footer when the last item is removed (1ms)
+    ✓ updates the footer information when the completed filter is clicked (3ms)
+    ✓ adds new items to the bottom of the list (4ms)
+  when the Todo list contains multiple items
+    ✓ marks all items as done when the toggle-all arrow is clicked (10ms)
+    ✓ marks and then unmarks all items when the toggle-all arrow is clicked twice (3ms)
+  when the Todo list contains a mixture of completed and active items
+    ✓ shows all items by default (1ms)
+    ✓ does not show active items when the completed view is used (1ms)
+    ✓ does not show completed items when the active view is used (1ms)
+    ✓ removes only completed items when clear-completed is clicked (1ms)
 
-  Todo Footer
-    - does not display the clear all completed items button if there are no completed items
-    ✓ displays the clear all completed items button if there are completed items (2ms)
+Todo Footer
+  - does not display the clear all completed items button if there are no completed items
+  ✓ displays the clear all completed items button if there are completed items (2ms)
+
+
+24 passing (212ms)
+1 pending
 ~~~
 
 So, apart from the binding tests, everything is super zippy.
