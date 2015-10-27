@@ -120,7 +120,7 @@ I would encourage you to skim read the entire set of [React TodoMVC App tests ](
 
 ## Performance
 
-Tests written this way to seem to execute very quickly. To give you an idea, here are the performance figures when running the complete set of tests on my machine:
+Tests written this way seem to execute very quickly. To give you an idea, here are the performance figures when running the complete set of tests on my machine:
 
 ~~~
 TodoMVC App
@@ -162,11 +162,11 @@ Todo Footer
 1 pending
 ~~~
 
-So, apart from the binding tests, everything is super zippy.
+So, apart from the binding tests which are more variable, tests are super zippy.
 
 ## Conclusion
 
-Tests written like this combine the benefits of unit and acceptance testing, while avoiding the potential disadvantages of acceptance testing:
+Tests written like this combine the benefits of unit and acceptance testing, while avoiding the potential disadvantages of acceptance testing, in that:
 
   1. Tests are no more costly to write than unit tests.
   2. Tests aren't prohibitively expensive to maintain due to unreliability &mdash; think [Selenium](http://www.seleniumhq.org/).
