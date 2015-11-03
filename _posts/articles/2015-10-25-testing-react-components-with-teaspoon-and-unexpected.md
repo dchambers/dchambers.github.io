@@ -44,7 +44,7 @@ it('only renders a header when there are no items in the list', function() {
   let todoApp = $(<TodoApp model={model} router={router}/>);
 
   // then
-  expect(todoApp.shallowRender()[0], 'to have rendered with all children',
+  expect(todoApp.shallowRender().unwrap(), 'to have rendered with all children',
     <Container componentName="TodoApp">
       <TodoHeader/>
     </Container>
@@ -66,10 +66,10 @@ it('allows an item to be added to the list', function() {
   let todoApp = $(<TodoApp model={model} router={router}/>);
 
   // when
-  todoApp.shallowRender().find('TodoHeader')[0].props.onTodoAdded('Item #1');
+  todoApp.shallowRender().find('TodoHeader').unwrap().props.onTodoAdded('Item #1');
 
   // then
-  expect(todoApp.shallowRender()[0], 'to have rendered with all children',
+  expect(todoApp.shallowRender().unwrap(), 'to have rendered with all children',
     <Container componentName="TodoApp">
       <TodoHeader/>
       <TodoItems activeTodoCount={1}>
