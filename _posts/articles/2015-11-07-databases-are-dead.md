@@ -71,7 +71,11 @@ But also, this is a better approach because there's an order of magnitude of pro
 
 ## The Architecture
 
-This is how I think a Redux nodb application is structured:
+This is how I think a simple Redux nodb application is structured:
+
+<script src="https://www.gliffy.com/diagramEmbed.js" type="text/javascript"></script><script type="text/javascript">gliffy_did="9394679";embedGliffy();</script>
+
+and this is what I think it looks like when fail-over, redundancy and scalability are added in:
 
 <script src="https://www.gliffy.com/diagramEmbed.js" type="text/javascript"></script><script type="text/javascript">gliffy_did="9392265";embedGliffy();</script>
 
