@@ -32,7 +32,8 @@ While I highly recommend watching the excellent videos and following the tutoria
 Points of interest:
 
   * We currently build databases around the current state of some data, but the most important information is the original set of events that led to that state.
-  * Databases should just be a series of cascading materialized views built from the original events.
+  * Databases should just be a set of materialized views built from the original events.
+  * With functional reactive programming, one can view the domain logic, the view, the DOM, and the browser's video memory as a pipeline of dependent materialized views flowing a stream of live updates from the databases materialized view(s).
 
 ### The Value of Values with Rich Hickey
 
@@ -91,14 +92,14 @@ The chronicler writes the records to a NAS, which is the closest thing to a data
 
 ### Data View
 
-The Data Views maintains a state-tree based on the event stream from the active chronicler. They are composed of a set of reducer functions and nothing else. In addition to the reducers for the domain actions, data-views must also support two non-domain specific actions:
+The Data Views maintain a state-tree based on the event stream from the active chronicler. They are composed of a set of reducer functions and nothing else. In addition to the reducers for the domain actions, data-views must also support two non-domain specific actions:
 
   1. `SET_STATE` to replace the state-tree with some data provided by the chronicler.
   2. `SNAPSHOT` to serialize the current state-tree to the SAN.
 
-Clients will normally seek to establish a connection to the data-view before connecting to the chronicler, on the basis that clients can't sensibly seek to affect the state-tree until they first know its current state. Here, round robin DNS is used to evenly share the load between the hosts providing the data-views.
+Clients will normally seek to establish a connection to the data-views before connecting to the chronicler, on the basis that clients can't sensibly seek to affect the state-tree until they first know its current state. Here, round robin DNS is used to evenly share the load between the hosts providing a particular data-view.
 
-For isomorphic apps, the data-view will also effectively be the app-server, as it will need to provide rendered page views for any app URLs, in addition to the streamed state updates.
+For isomorphic apps, the data-views will also effectively be app-servers, as they will need to provide rendered page views for any app URLs, in addition to the streamed state updates. Since there can be multiple data-views publishing updates for the same event stream, each update must include a unique event-identifer, and data-views that don't need to change based on some event will still need to send an empty update message so clients know when it's safe to re-render.
 
 ### Envoy
 
@@ -108,9 +109,9 @@ Envoys are purposely not communicated to when the chronicler is time traveling (
 
 ### Cascaded Data View
 
-A cascaded data-view provides some derived view based on the contents of one or more up-stream views. They use the same streaming state updates that clients use to access a view. Like normal data views, they are composed from a set of reducer functions and nothing else.
+A cascaded data-view provides some derived view based on the contents of one or more up-stream views. They use the same streaming state updates that clients use to access a view. Like normal data views, they are composed from a set of reducer functions and nothing else. They don't require snap-shotting since their state can be computed solely from the current state of one or more data-views.
 
-Cascaded data views are designed to be run on separate hosts from the view(s) they are derived from; instead, [reselect](https://github.com/rackt/reselect) can be used if you prefer to have the derived data directly within the primary data-view. So, they are mostly about scalability, but they also have the benefit that they can also be created by third parties since they use the same streaming connection available to clients.
+Cascaded data views are designed to be run on separate hosts from the view(s) they are derived from; instead, [reselect](https://github.com/rackt/reselect) can be used if you prefer to have the derived data directly within the primary data-views. So, they are mostly about scalability, but they also have the benefit that they can also be created by third parties since they use the same streaming connection available to clients.
 
 ## Scalability
 
