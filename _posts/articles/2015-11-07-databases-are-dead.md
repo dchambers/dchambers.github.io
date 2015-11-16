@@ -121,6 +121,19 @@ One of the nice things about this architecture is the data scalability. Traditio
 
 On the other hand, events are less coupled to an application. When a new application comes along we may find that certain events start to include additional information that the earlier applications didn't need, and include entirely new events too. But this is fine since the materialized views for the original events can continue to ignore these new events, and any new fields on pre-existing events, yet there is always a single unified event-stream for the entire business, and all of the apps and legacy apps that are created along the way.
 
+## Data Consistency
+
+> **UPDATE**: This section was added after Tomáš Drenčák pointed out that data-consistency in apps with multiple views isn't be guaranteed by only allowing client events that limit themselves to only describing a client's intentions.
+
+Although the chronicler can be used for basic verification of client actions, some additional steps are needed to ensure that actions won't break data consistency. There are two obvious ways this can be done:
+
+  1. The chronicler could maintain a minimal data-view with only enough data in it to allow it to verify data-consistency.
+  2. Two-phase commits could be used, where the chronicler emits tentative events, and where a designated data-view then emits a concrete event after performing data validation &mdash; the idea being that all other data-views ignore the tentative events and wait for the concrete events.
+
+This first option seems simpler at first glance because the client is directly informed about the status of the submitted action, but it's less scalable since it creates a single choke point within the system.
+
+Instead, it's possible to always use the second option, but where the chronicler keeps the connection open after acknowledging receipt of the action, and doesn't close the connection until the matching concrete event is known.
+
 ## Missing Bits
 
 There are a number of missing bits that, at present, apps would need to implement themselves:
