@@ -349,7 +349,7 @@ That's pretty sweet!
 
 When you put it all together you should end up with a `todo-items-reducer.js` that looks like this:
 
-~~~
+~~~js
 /* @flow */
 import {compose as lens, lensIndex as i, lensProp as p, remove, set} from 'ramda';
 
