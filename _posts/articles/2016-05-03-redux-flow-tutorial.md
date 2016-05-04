@@ -506,6 +506,12 @@ Let's now replace the `pretest` script in `package.json` with this, so that we h
 "pretest:typecheck": "flow",
 ~~~
 
+Because Flow and babel-core don't get on at present, you'll need to add the following line to the `ignore` section of `.flowconfig`:
+
+~~~
+.*node_modules/babel-core.*
+~~~
+
 If you run `npm test` again you should see that type-checking happens now too, and that everything passes!
 
 If you run `npm test` a second time you'll notice that it's quicker the second time around due to the fact that the `flow` command spawned a background daemon the first time around. You can confirm this for yourself by running:
