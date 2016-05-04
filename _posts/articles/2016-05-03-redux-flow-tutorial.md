@@ -10,20 +10,22 @@ image:
 date: 2016-05-03T20:49:00-00:00
 ---
 
-# Redux Flow Tutorial
+# Introduction
 
-In this tutorial I'm going to show you how you can add Facebook's [Flow](http://flowtype.org/) to your [Redux](https://github.com/reactjs/redux) work-flow, and stop using the older `propTypes` feature for JSX template validation. Although [it's possible](https://github.com/facebook/immutable-js/issues/203#issuecomment-187175318) to use [Immutable.js](https://facebook.github.io/immutable-js/) with Flow, using something like Immutable.js reduces the insight Flow has into your code, and so reduces the number of bugs that it will detect. Instead, I'm going to use ES6/7 + [Ramda](http://ramdajs.com/), which has the additional benefit that you can increase the amount of functional re-use you can achieve due to Ramda's excellent [auto-currying support](http://fr.umio.us/why-ramda/), and that you'll be using native JavaScript types instead of Immutable's proprietary types.
+In this tutorial I'm going to show you how you can add Facebook's [Flow](http://flowtype.org/) to your [Redux](https://github.com/reactjs/redux) work-flow, and stop relying on the older `propTypes` feature for JSX template validation. Flow is a static typechecker for JavaScript that is broadly comparable to TypeScript, with the main difference being that types are optional as Flow has a powerful type inference engine. If you're not already familiar with Flow then I'd highly recommend the [Introductory Video](https://www.youtube.com/watch?v=M8x0bc81smU).
 
-It won't all be plain sailing though, and you'll see along the way that Flow and the Flow infrastructure still have a few rough edges, but that Flow often has an insight into your code that you won't have experienced with traditional compilers.
+Although [Immutable.js](https://facebook.github.io/immutable-js/) is commonly paired with Redux to guarantee immutability, using something like Immutable.js reduces the insight Flow has into your code, and so reduces the number of bugs that it will detect. Instead, I'm going to use the ES6/7 rest/spread operators & [Ramda](http://ramdajs.com/) with plain old JavaScript arrays and objects. This is possible since Ramda's utility functions and the ES6/7 rest/spread operators never mutate the data you give them, and this has the additional benefit that you can increase the amount of functional re-use you can achieve due to Ramda's excellent [auto-currying support](http://fr.umio.us/why-ramda/), and of course that you'll be using native JavaScript types instead of Immutable's proprietary types.
+
+It won't all be plain sailing, and you'll see along the way that Flow and the Flow infrastructure still have a few rough edges, but that Flow often has an insight into your code that you won't have experienced with traditional compilers.
 
 If you don't have time to follow the tutorial you can just read along. The [redux-flow-tutorial](https://github.com/dchambers/redux-flow-tutorial) contains all of the resultant source code for you to look at, with commits at the various milestones throughout the article so you can track how we arrive at the final conclusion.
 
 
 ## What about TypeScript?
 
-At this point it's worth talking about TypeScript. TypeScript also provides static typing for JavaScript, but uses a type system that started life being much more similar to what you get with Java and C#, and so didn't work with lots of idiomatic JavaScript. More recently, TypeScript has begun adding the same type of features you find in Flow (like _union-types_, _intersection-types_ and _action-guards_), but it still hasn't achieved parity, and it still can't be used to type an idiomatic Redux reducer, or lots of other idiosyncratic JavaScript patterns we find in the wild.
+At this point it's worth talking more about TypeScript. TypeScript also provides static typing for JavaScript, but uses a type system that started life being much more similar to what you get with Java and C#, and so didn't work with lots of idiomatic JavaScript. More recently, TypeScript has begun adding the same type of features you find in Flow (like _union-types_, _intersection-types_ and _action-guards_), but it still hasn't achieved parity, and it still can't be used to type an idiomatic Redux reducer, or lots of other idiosyncratic JavaScript patterns we find in the wild.
 
-There's nothing particularly wrong with that, but it does mean that TypeScript is better suited for Angular 2 development then it is for Redux development right now, though the two do seem to be slowly converging. However, the thing that draws me to Flow is that it fits better into the NPM eco-system, and can be used alongside stellar tools like Babel and ESLint. This is a shame because at this point TypeScript has a more mature eco-system than Flow; partly due to it being an older project, but also because it's a less technically challenging endeavour.
+There's nothing particularly wrong with that, but it does mean that TypeScript is better suited for Angular 2 development then it is for Redux development right now, though the two do seem to be slowly converging. Additionally, Flow fits better into the NPM eco-system, and can be used alongside stellar tools like Babel and ESLint, which is another reason you might prefer it over TypeScript. This is a shame though, because at this point TypeScript has a more mature eco-system than Flow; partly due to it being an older project, but also because it's a less technically challenging endeavour.
 
 
 ## Before We Start
@@ -34,7 +36,7 @@ Before we start, let's upgrade to a recent version of Node.js so we can (almost)
 nvm install 5.11.0
 ~~~
 
-If you don't use NVM then you may want to upgrade some other way, or just not bother since it's not too critical to the rest of this tutorial.
+If you don't use NVM then you may want to upgrade some other way, or just not bother since it's actually not too critical to the rest of this tutorial.
 
 ## Let's Go...
 
@@ -107,7 +109,7 @@ This reducer is using ES6/7 features like the array/object spread operators to e
 Let's install Mocha, Chai & Babel so we can test our reducer:
 
 ~~~bash
-npm install --save-dev mocha chai babel babel-preset-modern babel-plugin-transform-object-rest-spread
+npm install --save-dev mocha chai babel-core babel-preset-modern babel-plugin-transform-object-rest-spread
 ~~~
 
 Here we've installed [babel-preset-modern](https://www.npmjs.com/package/babel-preset-modern) instead of [babel-preset-es2015](https://www.npmjs.com/package/babel-preset-es2015), which will reduce what's transpiled to pretty much just the `import` and `export` statements &mdash; use babel-preset-es2015 instead if you didn't upgrade to a recent version of Node.js at the beginning of the tutorial.
@@ -201,7 +203,7 @@ and replace the `test` script in `package.json` with this:
 "test": "mocha --compilers js:babel-core/register src/**/*.spec.js"
 ~~~
 
-If you now run `npm test` you will see that all of the tests successfully pass. The eagle eyed among you may have noticed that we didn't use _action-creator_ functions within the test. Action creator functions have always felt to me like necessary boiler-plate, the need for for which would disappear if our JSON structures could be automatically type checked; well now they will be!
+If you now run `npm test` you will see that all of the tests successfully pass. The eagle eyed among you may have noticed that we didn't use _action-creator_ functions within the test. Action creator functions have always felt to me like necessary boiler-plate, the need for for which would disappear if our JSON structures could be automatically type checked; well soon they will be!
 
 
 ## Adding a linting pre-test step
@@ -524,9 +526,30 @@ Given this is the case, you'll next want to install the [linter-flow](https://at
 
 ## Kicking the tyres
 
-At this point you may want to have a play around, and see exactly what Flow is and isn't capable of.
+At this point you may want to have a play around, and see exactly what Flow is and isn't capable of. For example, if you now change the definition of `AddTodoAction` to this:
 
-**Warning:** Supporting union and intersection types in a way where the error messages you receive still make sense in all cases is non-trivial, and there are presently still a few edge cases you may run into. These are slowly being fixed as far as I can tell, and things will hopefully become stable before too much longer.
+~~~js
+type AddTodoAction = {
+  type: 'ADD_TODOX',
+  text: string
+};
+~~~
+
+and then re-run `npm test`, you'll see the following errors within the terminal output:
+
+~~~bash
+src/reducers/todo-items-reducer.spec.js:13
+ 13:     const todoItems = todoItemsReducer(undefined, {type: 'ADD_TODO', text: 'Do stuff.'});
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ function call
+ 13:     const todoItems = todoItemsReducer(undefined, {type: 'ADD_TODO', text: 'Do stuff.'});
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ object literal. This type is incompatible with
+ 43: export const todoItemsReducer = (todoItems: TodoItems = [], action: TodoAction): TodoItems => {
+                                                                         ^^^^^^^^^^ union: AddTodoAction | DeleteTodoAction | EditTodoAction | ToggleTodoAction | CompleteAllAction | ClearCompletedAction. See: src/reducers/todo-items-reducer.js:43
+~~~
+
+and you should see the same errors displayed in your editor too.
+
+**Warning:** Supporting union and intersection types in a way where the error messages you receive still make sense in all cases is non-trivial, and there are presently still a few edge cases you may run into. These are slowly being fixed as far as I can tell, and things will hopefully improve before too much longer.
 
 
 ## Adding a simplistic view
