@@ -729,6 +729,8 @@ so that we can start the server like this:
 npm start
 ~~~
 
+Even if you're not following along with the tutorial you can demo the [running app](https://dchambers.github.io/redux-flow-tutorial/) here.
+
 ## JSX Validation Without `propType`
 
 Adding type annotations to `Todo.jsx` and `TodoList.jsx` first requires us to add a `/* @flow */` comment to both files, then to update the renderer in `Todo.jsx` to have this type signature:
