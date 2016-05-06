@@ -355,7 +355,7 @@ When you put it all together you should end up with a `todo-items-reducer.js` th
 /* @flow */
 import {compose as lens, lensIndex as i, lensProp as p, remove, set} from 'ramda';
 
-export export type TodoItems = Array<TodoItem>;
+export type TodoItems = Array<TodoItem>;
 type TodoItem = {
   text: string,
   completed: boolean
@@ -510,6 +510,7 @@ Because Flow and babel-core don't get on at present, you'll need to add the foll
 
 ~~~
 .*node_modules/babel-core.*
+.*node_modules/fbjs.*
 ~~~
 
 If you run `npm test` again you should see that type-checking happens now too, and that everything passes!
@@ -608,7 +609,6 @@ With the config in place, you can now add the following new files:
 `src/Todo.jsx`:
 
 ~~~js
-{% raw %}
 import React, {PropTypes} from 'react';
 
 export const Todo = ({text, completed, onClick}) => (
@@ -629,7 +629,6 @@ Todo.propTypes = {
 };
 
 export default Todo;
-{% endraw %}
 ~~~
 
 `src/TodoList.jsx`:
@@ -703,11 +702,7 @@ render(
 );
 ~~~
 
-If you try running `npm test` you'll notice you get a number of Flow errors due to the 'fbjs' utility library. Until these errors are fixed upstream, you can just have Flow ignore this library by adding the following line to the `ignore` section of `.flowconfig`:
-
-~~~
-.*node_modules/fbjs.*
-~~~
+You should now be able to successfully run `npm test` again.
 
 ## Viewing the running app
 
@@ -781,7 +776,6 @@ and updating the `plugins` section of `.babelrc` to this:
 Once this is done you can update `Todo.jsx` to look like this:
 
 ~~~js
-{% raw %}
 /* @flow */
 import React from 'react';
 
@@ -806,7 +800,6 @@ export default class Todo extends React.Component {
     );
   }
 }
-{% endraw %}
 ~~~
 
 and `TodoList.jsx` to look like this:
