@@ -6,9 +6,13 @@ categories: articles
 excerpt:
 tags: [facebook, flow, react, redux, jsx]
 image:
-  feature:
+  feature: flow.jpg
+  thumb: flow-thumb.jpg
 date: 2016-05-03T20:49:00-00:00
 ---
+{% comment %}
+Feature image is from Brett Jordan, available here <https://www.flickr.com/photos/x1brett/8292745767>
+{% endcomment %}
 
 # Introduction
 
